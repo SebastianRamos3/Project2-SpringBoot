@@ -26,7 +26,7 @@ interface Team {
 }
 
 const FavoriteTeams = () => {
-  const route = useRoute<RouteProp<RootStackParamList, "favoriteTeams">>();
+  const route = useRoute<RouteProp<RootStackParamList>>();//Removed "favoriteTeams" that went after "RootStackParamList" for git debugging purposes
   const username = route.params?.username; // Get username from navigation params
   const [teams, setTeams] = useState<Team[]>([]);
   const [selectedTeams, setSelectedTeams] = useState<string[]>([]);
