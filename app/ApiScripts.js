@@ -16,20 +16,13 @@ export const apiCall = async (endpoint) => {
 };
 export const callTeams = async () => {
   try {
-    const json = await apiCall(
-      "https://api-nba-v1.p.rapidapi.com/teams?league=standard"
-    );
-    if (!json || !json.response) {
+    const json = await apiCall("https://sports-betting-48b2640f3be7.herokuapp.com/api/teams", true);
+
+    if (!json || !Array.isArray(json)) {
       throw new Error("Invalid API response");
     }
-    // Create the teamData array with below structure
-    const teamData = json.response
-      // I want to filter out teams that aren't nbaFranchises (you would think I could use the league filter, but it isn't an option)
-      // I want to check the nbaFranchise field and return a new array populated only with teams where this field is true
-      // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter
+    const teamData = json
       .filter((team) => team.nbaFranchise === true)
-      // I also want to sort out specific information.
-      // This may change depending on what we need. For now, it will map out the fields we use in our table
       .map((team) => ({
         id: team.id,
         name: team.name,
@@ -37,13 +30,12 @@ export const callTeams = async () => {
         logo: team.logo,
       }));
 
-    //console.log("teamData:", teamData);
     return teamData;
   } catch (error) {
     console.error("Error fetching teams:", error);
     return [];
   }
-};
+  };
 export const callGamesByDate = async (startDate, endDate, teamID) => {
   try {
     const json = await apiCall(
