@@ -1,3 +1,5 @@
+const BASE_URL = "https://sports-betting-48b2640f3be7.herokuapp.com"; //I added the url of the backend here
+
 export const apiCall = async (endpoint) => {
   try {
     const response = await fetch(endpoint, {
@@ -16,7 +18,7 @@ export const apiCall = async (endpoint) => {
 };
 export const callTeams = async () => {
   try {
-    const json = await apiCall("https://sports-betting-48b2640f3be7.herokuapp.com/api/teams", true);
+    const json = await apiCall(`${BASE_URL}/api/teams`, true);
 
     if (!json || !Array.isArray(json)) {
       throw new Error("Invalid API response");
@@ -36,6 +38,23 @@ export const callTeams = async () => {
     return [];
   }
   };
+  //I added this function to get the favorite teams of a user from the backend
+export const getFavorites = async (userId) => {
+  try {
+    const res = await fetch(`${BASE_URL}/api/v1/users/${userId}/favorites`);
+    if (!res.ok){
+      throw new Error(`Failed to fetch favorites`);
+      return await res.json();
+    }
+  } 
+  catch (err){
+    console.error("Error fetching favorites:", err);
+    return [];
+  }
+};
+
+// I still need to add the function to add and remove favorite teams which are post and delete requests
+
 export const callGamesByDate = async (startDate, endDate, teamID) => {
   try {
     const json = await apiCall(
