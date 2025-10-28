@@ -43,13 +43,38 @@ export const getFavorites = async (userId) => {
   try {
     const res = await fetch(`${BASE_URL}/api/v1/users/${userId}/favorites`);
     if (!res.ok){
-      throw new Error(`Failed to fetch favorites`);
-      return await res.json();
+      throw new Error(`Failed to fetch favorites: ${res.status}`);
     }
+    const json = await res.json();
+    return Array.isArray(json) ? json : [];
   } 
   catch (err){
     console.error("Error fetching favorites:", err);
     return [];
+  }
+};
+
+export const addFavorite = async (userId, teamId) => {
+  try{
+    const res = await fetch(`${BASE_URL}/api/v1/users/${userId}/favorites?teamId=${teamId}`, {
+      method: "POST",});
+      return res.ok;
+  }
+  catch(err){
+    console.error("Error adding favorite:", err);
+    return false;
+  }
+};
+
+export const removeFavorite = async (userId, teamId) => {
+  try{
+    const res = await fetch(`${BASE_URL}/api/v1/users/${userId}/favorites/${teamId}`, {
+      method: "DELETE",});
+      return res.ok;
+  }
+  catch(err){
+    console.error("Error removing favorite:", err);
+    return false;
   }
 };
 

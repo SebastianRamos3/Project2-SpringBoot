@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
   Image,
 } from "react-native";
-import { callTeams } from "../ApiScripts";
+import { callTeams, getFavorites, removeFavorite, addFavorite} from "../ApiScripts";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../navagation/types";
 import {
@@ -34,6 +34,7 @@ const FavoriteTeams = () => {
 
   useEffect(() => {
     const initialize = async () => {
+      const userId = route.params?.userId;
       if (!username) {
         console.error("No username received via navigation");
         return;
@@ -42,17 +43,12 @@ const FavoriteTeams = () => {
       setLoading(true);
 
       try {
-        const favTeams = await getFavTeamNames(username);
-        setSelectedTeams(favTeams || []);
-
-        process.env.RAPIDAPI_KEY = "f48a5921f5msh580809ba8c9e6cfp181a8ajsn545d715d6844";
+        const favTeams = await getFavorites(userId);
+        setSelectedTeams((favTeams || []).map((t) => String(t.id)));
         const teamData = await callTeams();
-
-        if (teamData && teamData.length > 0) {
-          setTeams(teamData);
-        } else {
-          console.error("No teams received from API.");
-        }
+        setTeams(teamData);
+        setLoading(false);
+      
       } catch (error) {
         console.error("Error fetching teams:", error);
       }
@@ -61,23 +57,30 @@ const FavoriteTeams = () => {
     };
 
     initialize();
-  }, [username]);
+  }, [route.params]);
 
-  const toggleTeamSelection = async (team_name: string) => {
-    if (!username) return;
+  const toggleTeamSelection = async (teamId: string, teamName: string) => {
+    const userId = route.params?.userId;
+    if (!userId) return;
 
-    let updatedTeams = [...selectedTeams];
+    const already = selectedTeams.includes(teamId);
 
-    if (updatedTeams.includes(team_name)) {
-      await removeTeamFromFav(username, team_name);
-      updatedTeams = updatedTeams.filter((name) => name !== team_name);
-    } else {
-      await addTeamToFavs(username, team_name);
-      updatedTeams.push(team_name);
+    if(already){
+      const ok = await removeFavorite(userId, teamId);
+      if(!ok){
+        console.error("Failed to remove favorite on server");
+        return;
+      }
+      setSelectedTeams(selectedTeams.filter((id) => id !== teamId));
     }
-
-    setSelectedTeams(updatedTeams);
-    await logDatabaseContents();
+    else{
+      const ok = await addFavorite(userId, teamId);
+      if(!ok){
+        console.error("Failed to add favorite on server");
+        return;
+    }
+      setSelectedTeams([...selectedTeams, teamId]);
+    }
   };
 
   if (loading) {
