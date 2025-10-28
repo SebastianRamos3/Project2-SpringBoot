@@ -54,10 +54,11 @@ export default function LoginScreen() {
         if (userID) {
           //await AsyncStorage.setItem("userID", userID.toString()); // Store userID
           await AsyncStorage.setItem("username", username);  // Store username
+          await AsyncStorage.setItem("userID", String(userID));
           Alert.alert("Welcome", "You are now logged in!");
 
           setTimeout(() => {
-            navigation.navigate("favoriteTeams", { username }); // Pass username via favoriteTeams
+            navigation.navigate("favoriteTeams", { userId: Number(userID), username });
           }, 500);
         } else {
           Alert.alert("Error", "User not found.");
