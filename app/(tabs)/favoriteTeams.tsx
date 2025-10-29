@@ -1,7 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Image,} from "react-native";
-import { callTeams, getFavorites, removeFavorite, addFavorite } from "../ApiScripts";
-import { useRoute, RouteProp } from "@react-navigation/native";
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator,
+  Image,
+} from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { callTeams } from "../ApiScripts";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../navagation/types";
 import { addTeamToFavs, removeTeamFromFav } from "../../database/db";
 
