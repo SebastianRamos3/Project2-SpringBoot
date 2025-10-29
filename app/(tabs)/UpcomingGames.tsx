@@ -9,8 +9,6 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { callGamesByDate } from "../ApiScripts";
-import { useNavigation, NavigationProp } from "@react-navigation/native";
-import { RootStackParamList } from "../navagation/types";
 import { getAllFavTeamInfo, logDatabaseContents } from "../../database/db";
 import { useFocusEffect } from "@react-navigation/native";
 
@@ -22,7 +20,6 @@ interface Game {
 }
 
 const UpcomingGames = () => {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [userName, setUserName] = useState<string | null>(null);
@@ -73,7 +70,7 @@ const UpcomingGames = () => {
         "to:",
         endDateString
       );
- 
+
       // Fetch games for each of the selected teams using callGamesByDate
       let allGames: Game[] = [];
       for (const teamID of favTeamNames) {
@@ -194,25 +191,25 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   teamText: {
-    fontSize: 16, 
-    textAlign: "center", 
+    fontSize: 16,
+    textAlign: "center",
   },
   dateText: {
-    fontSize: 14, 
+    fontSize: 14,
     color: "#666",
-    textAlign: "center", 
+    textAlign: "center",
   },
   winRateText: {
-    fontSize: 14, 
+    fontSize: 14,
     color: "#4CAF50",
-    marginTop: 6, 
+    marginTop: 6,
     textAlign: "center",
   },
   teamLogoContainer: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center", 
-    marginBottom: 8,  
+    justifyContent: "center",
+    marginBottom: 8,
   },
   teamLogo: {
     width: 30,

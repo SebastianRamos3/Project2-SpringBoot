@@ -9,32 +9,16 @@ import {
   ImageBackground,
   ActivityIndicator,
 } from "react-native";
-import { useNavigation, NavigationProp } from "@react-navigation/native";
-import { RootStackParamList } from "../navigation/types";
+import { useRouter } from "expo-router";
 import loginPic from "../../assets/images/loginPic2.jpg";
-import { verifyUserLogin, getUserID, initializeDatabase } from "../../database/db";
+import { loginUser } from "../ApiScripts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function LoginScreen() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [dbInitialized, setDbInitialized] = useState(false);
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-
-  useEffect(() => {
-    const initializeDb = async () => {
-      try {
-        await initializeDatabase();
-        setDbInitialized(true);
-      } catch (error) {
-        console.error("Database initialization error:", error);
-        Alert.alert("Error", "An error occurred while initializing the database.");
-      }
-    };
-
-    initializeDb();
-  }, []);
+  const router = useRouter();
 
   const handleLogin = async () => {
     if (!username || !password) {
@@ -45,37 +29,35 @@ export default function LoginScreen() {
     setLoading(true);
 
     try {
-      const isValidUser = await verifyUserLogin(username, password);
+      const result = await loginUser(username, password);
       setLoading(false);
 
-      if (isValidUser) {
-        const userID = await getUserID(username);
+      if (result.success) {
+        const { userId, username: returnedUsername } = result.data;
 
-        if (userID) {
-          //await AsyncStorage.setItem("userID", userID.toString()); // Store userID
-          await AsyncStorage.setItem("username", username);  // Store username
-          await AsyncStorage.setItem("userID", String(userID));
-          Alert.alert("Welcome", "You are now logged in!");
+        // Store user data in AsyncStorage
+        await AsyncStorage.setItem("username", returnedUsername);
+        await AsyncStorage.setItem("userID", String(userId));
+        Alert.alert("Welcome", "You are now logged in!");
 
-          setTimeout(() => {
-            navigation.navigate("favoriteTeams", { userId: Number(userID), username });
-          }, 500);
-        } else {
-          Alert.alert("Error", "User not found.");
-        }
+        setTimeout(() => {
+          router.push({
+            pathname: "/favoriteTeams",
+            params: {
+              userId: Number(userId),
+              username: returnedUsername,
+            },
+          });
+        }, 500);
       } else {
-        Alert.alert("Error", "Incorrect username or password.");
+        Alert.alert("Error", result.error || "Login failed");
       }
     } catch (error) {
       setLoading(false);
-      Alert.alert("Error", "An error occurred while verifying login.");
+      Alert.alert("Error", "An error occurred while logging in.");
       console.error(error);
     }
   };
-
-  if (!dbInitialized) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
-  }
 
   return (
     <ImageBackground source={loginPic} style={styles.backgroundImage}>
