@@ -8,9 +8,9 @@ import {
   Alert,
   ImageBackground,
 } from "react-native";
-import { insertUser, isUsernameAvailable } from "../database/db"; // Import database functions
+import { registerUser } from "./ApiScripts"; 
 import accountPic from "../assets/images/accountCreationPic.jpg"; // Your background image
-import { useNavigation } from "@react-navigation/native"; // Import the useNavigation hook
+import { useRouter } from "expo-router"; // Import the useRouter hook
 
 const AccountCreation = () => {
   // State to store the values of the form fields
@@ -19,7 +19,7 @@ const AccountCreation = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const navigation = useNavigation(); // Access the navigation object
+  const router = useRouter(); // Access the router object
 
   // Handle account creation logic
   const handleCreateAccount = async () => {
@@ -33,28 +33,22 @@ const AccountCreation = () => {
       return;
     }
 
-    // Check if the username already exists in the database
-    const usernameExists = await isUsernameAvailable(username);
-    if (!usernameExists) {
-      Alert.alert("Error", "Username already exists!");
-      return;
-    }
-
     try {
-      // Insert the new user into the database
-      await insertUser(username, password);
-
-      // Simulate account creation success
-      Alert.alert("Account Created", `Welcome, ${username}!`);
-
-      // After successful account creation, navigate to the Login screen
-      navigation.navigate("Login");
-
-      // Reset form fields (optional)
-      setUsername("");
-      setEmail("");
-      setPassword("");
-      setConfirmPassword("");
+      // Call backend API to register user
+      const result = await registerUser(username, password, email);
+      
+      if (result.success) {
+        Alert.alert("Account Created", `Welcome, ${username}!`);
+        router.push("/login");
+        
+        // Reset form fields
+        setUsername("");
+        setEmail("");
+        setPassword("");
+        setConfirmPassword("");
+      } else {
+        Alert.alert("Error", result.error || "Failed to create account");
+      }
     } catch (error) {
       console.error("Error creating account:", error);
       Alert.alert("Error", "An error occurred while creating the account.");
@@ -108,7 +102,7 @@ const AccountCreation = () => {
           <Text>Already have an account? </Text>
           <Button
             title="Login"
-            onPress={() => navigation.navigate("Login")} // Navigate to the Login screen
+            onPress={() => router.push("/login")} // Navigate to the Login screen
           />
         </View>
       </View>
