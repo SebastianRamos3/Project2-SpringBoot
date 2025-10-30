@@ -55,7 +55,6 @@ const UpcomingGames = () => {
         setGames([]);
         return;
       }
-
       // Get current date and calculate the end date (14 days ahead)
       const currentDate = new Date();
       const endDate = new Date(currentDate);
@@ -75,11 +74,7 @@ const UpcomingGames = () => {
       let allGames: Game[] = [];
       for (const teamID of favTeamNames) {
         console.log(`📡 Fetching games for team: ${teamID}`);
-        const teamGames = await callGamesByDate(
-          startDateString,
-          endDateString,
-          teamID
-        );
+        const teamGames = await callGamesByDate(teamID, startDateString, endDateString);
 
         if (teamGames.length === 0) {
           console.warn(`No games found for team ${teamID}`);
@@ -87,7 +82,7 @@ const UpcomingGames = () => {
           allGames = [...allGames, ...teamGames];
         }
       }
-
+ 
       if (allGames.length === 0) {
         console.warn("No upcoming games found.");
       }

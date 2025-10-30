@@ -190,3 +190,61 @@ export async function updateUsername(userId, newUsername) {
     return { success: false, error: "Network error" };
   }
 }
+
+export async function callGamesByDate(teamID, startDate, endDate) {
+  // --- Hardcoded mock data ---
+  const mockGames = [
+    {
+      id: "1",
+      date: new Date("2025-11-02"),
+      homeTeam: {
+        name: "Los Angeles Lakers",
+        nickname: "Lakers",
+        logo: "https://upload.wikimedia.org/wikipedia/commons/3/3c/Los_Angeles_Lakers_logo.svg",
+      },
+      awayTeam: {
+        name: "Golden State Warriors",
+        nickname: "Warriors",
+        logo: "https://upload.wikimedia.org/wikipedia/en/0/01/Golden_State_Warriors_logo.svg",
+      },
+    },
+    {
+      id: "2",
+      date: new Date("2025-11-05"),
+      homeTeam: {
+        name: "Boston Celtics",
+        nickname: "Celtics",
+        logo: "https://upload.wikimedia.org/wikipedia/en/8/8f/Boston_Celtics.svg",
+      },
+      awayTeam: {
+        name: "Miami Heat",
+        nickname: "Heat",
+        logo: "https://upload.wikimedia.org/wikipedia/en/f/fb/Miami_Heat_logo.svg",
+      },
+    },
+    {
+      id: "3",
+      date: new Date("2025-11-07"),
+      homeTeam: {
+        name: "Chicago Bulls",
+        nickname: "Bulls",
+        logo: "https://upload.wikimedia.org/wikipedia/en/6/67/Chicago_Bulls_logo.svg",
+      },
+      awayTeam: {
+        name: "New York Knicks",
+        nickname: "Knicks",
+        logo: "https://upload.wikimedia.org/wikipedia/en/2/25/New_York_Knicks_logo.svg",
+      },
+    },
+  ];
+
+  // Filter by teamID if desired (so Lakers show only Lakers’ games, etc.)
+  const filtered = mockGames.filter(
+    (g) =>
+      g.homeTeam.name.toLowerCase().includes(teamID) ||
+      g.awayTeam.name.toLowerCase().includes(teamID)
+  );
+
+  // Return filtered or full list if nothing matches
+  return filtered.length > 0 ? filtered : mockGames;
+}
